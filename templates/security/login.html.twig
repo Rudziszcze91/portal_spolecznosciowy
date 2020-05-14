@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Log in!{% endblock %}
+
+{% block body %}
+    <!--================Home Banner Area =================-->
+    <section class="home_banner_area">
+        <div class="container box_1620">
+            <div class="banner_inner d-flex align-items-center">
+{#                <div class="banner_content">#}
+                    <div class="col-12">
+                        <form method="post">
+                            {% if error %}
+                                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                            {% endif %}
+
+                            <h1 class="h3 mb-3 font-weight-normal">{{ 'login'|trans }}</h1>
+                            <label for="inputEmail">{{ 'email'|trans }}</label>
+                            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" required autofocus>
+                            <label for="inputPassword">{{ 'password'|trans }}</label>
+                            <input type="password" name="password" id="inputPassword" class="form-control" required>
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                            <button class="btn btn-lg btn-primary mt-4" type="submit">{{ 'login'|trans }}</button>
+                        </form>
+                    </div>
+{#                </div>#}
+            </div>
+        </div>
+    </section>
+    <!--================End Home Banner Area =================-->
+{% endblock %}

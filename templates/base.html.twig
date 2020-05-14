@@ -1,21 +1,112 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Welcome!{% endblock %}</title>
-    {% block stylesheets %}
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-    {% endblock %}
-</head>
-<body>
-<div class="container-fluid">
-    {% block body %}{% endblock %}
-</div>
-{% block javascripts %}
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-{% endblock %}
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}{% endblock %} | {{ 'title'|trans }}</title>
+        <link rel="icon" href="{{ asset('img/favicon.png') }}" type="image/png">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('css/bootstrap.css') }}">
+            <link rel="stylesheet" href="{{ asset('vendors/linericon/style.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/font-awesome.min.css') }}">
+            <link rel="stylesheet" href="{{ asset('vendors/owl-carousel/owl.carousel.min.css') }}">
+            <link rel="stylesheet" href="{{ asset('vendors/lightbox/simpleLightbox.css') }}">
+            <link rel="stylesheet" href="{{ asset('vendors/nice-select/css/nice-select.css') }}">
+            <link rel="stylesheet" href="{{ asset('vendors/animate-css/animate.css') }}">
+            <link rel="stylesheet" href="{{ asset('vendors/popup/magnific-popup.css') }}">
+            <link rel="stylesheet" href="{{ asset('vendors/flaticon/flaticon.css') }}">
+            <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+            <!-- main css -->
+            <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/responsive.css') }}">
+        {% endblock %}
+    </head>
+    <body>
+        <!--================Header Menu Area =================-->
+        <header class="header_area">
+            <div class="main_menu">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <div class="container box_1620">
+                        <!-- Brand and toggle get grouped for better mobile display -->
+                        <a class="navbar-brand logo_h" href="{{ url('index') }}" style=""><img src="{{ asset('img/logo.png') }}"></a>
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+                            <ul class="nav navbar-nav menu_nav ml-auto">
+                                {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                                    <li class="nav-item"><a class="nav-link" href="{{ url('app_logout') }}">{{ app.user.userInfo.firstname }}, {{ 'logout'|trans }}</a></li>
+                                {% else %}
+                                    <li class="nav-item"><a class="nav-link" href="{{ url('app_login') }}">{{ 'login'|trans }}</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="{{ url('app_logout') }}">{{ 'register'|trans }}</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+        <!--================Header Menu Area =================-->
+
+        {% block body %}{% endblock %}
+
+        <!--================Footer Area =================-->
+        <footer class="footer_area p_120">
+            <div class="container">
+                <div class="row footer_inner">
+                    <div class="col-lg-6 col-sm-6">
+                        <aside class="f_widget ab_widget">
+                            <div class="f_title">
+                                <h3>About Me</h3>
+                            </div>
+                            <p>Do you want to be even more successful? Learn to love learning and growth. The more effort you put into improving your skills,</p>
+                            <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                                Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+                                <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. --></p>
+                        </aside>
+                    </div>
+                    <div class="col-lg-6 col-sm-6">
+                        <aside class="f_widget news_widget">
+                            <div class="f_title">
+                                <h3>Newsletter</h3>
+                            </div>
+                            <p>Stay updated with our latest trends</p>
+                            <div id="mc_embed_signup">
+                                <form target="_blank" action="https://spondonit.us12.list-manage.com/subscribe/post?u=1462626880ade1ac87bd9c93a&amp;id=92a4423d01" method="get" class="subscribe_form relative">
+                                    <div class="input-group d-flex flex-row">
+                                        <input name="EMAIL" placeholder="Enter email address" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Email Address '" required="" type="email">
+                                        <button class="btn sub-btn"><span class="lnr lnr-arrow-right"></span></button>
+                                    </div>
+                                    <div class="mt-10 info"></div>
+                                </form>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            </div>
+        </footer>
+        <!--================End Footer Area =================-->
+
+        {% block javascripts %}
+            <script src="{{ asset('js/jquery-3.3.1.min.js') }}"></script>
+            <script src="{{ asset('js/popper.js') }}"></script>
+            <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+            <script src="{{ asset('js/stellar.js') }}"></script>
+            <script src="{{ asset('vendors/lightbox/simpleLightbox.min.js') }}"></script>
+            <script src="{{ asset('vendors/nice-select/js/jquery.nice-select.min.js') }}"></script>
+            <script src="{{ asset('vendors/isotope/imagesloaded.pkgd.min.js') }}"></script>
+            <script src="{{ asset('vendors/isotope/isotope.pkgd.min.js') }}"></script>
+            <script src="{{ asset('vendors/owl-carousel/owl.carousel.min.js') }}"></script>
+            <script src="{{ asset('vendors/popup/jquery.magnific-popup.min.js') }}"></script>
+            <script src="{{ asset('js/jquery.ajaxchimp.min.js') }}"></script>
+            <script src="{{ asset('vendors/counter-up/jquery.waypoints.min.js') }}"></script>
+            <script src="{{ asset('vendors/counter-up/jquery.counterup.min.js') }}"></script>
+            <script src="{{ asset('js/mail-script.js') }}"></script>
+            <script src="{{ asset('js/theme.js') }}"></script>
+        {% endblock %}
+    </body>
 </html>

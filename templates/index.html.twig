@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ 'title_index'|trans }}
+{% endblock %}
+
+{% block body %}
+    <!--================Home Banner Area =================-->
+    <section class="home_banner_area">
+        <div class="container box_1620">
+            <div class="text-center align-items-center" style="min-height: unset;">
+                <div class="banner_content">
+                    <div class="personal_text">
+                        <h6>{{ 'index_lead'|trans }}</h6>
+                        <h3>{{ 'index_title'|trans }}</h3>
+                        <p style="max-width: 800px;margin: 0 auto;">{{ 'index_message'|trans }}</p>
+                        <form method="get" action="{{ url('search') }}" style="margin: 150px auto;max-width: 1000px">
+                            <input type="text" name="phrase" id="text" class="form-control" required autofocus placeholder="{{ 'enter_name'|trans }}">
+                            <button class="btn btn-lg btn-primary mt-4" type="submit">{{ 'button_search'|trans }}</button>
+                        </form>
+{#                        <ul class="list personal_social">#}
+{#                            <li><a href="#"><i class="fa fa-facebook"></i></a></li>#}
+{#                            <li><a href="#"><i class="fa fa-twitter"></i></a></li>#}
+{#                            <li><a href="#"><i class="fa fa-linkedin"></i></a></li>#}
+{#                        </ul>#}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--================End Home Banner Area =================-->
+{% endblock %}

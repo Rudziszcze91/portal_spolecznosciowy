@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ 'title_search'|trans }}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .pagination {
+            display: inline-flex !important;
+        }
+        .lead {
+            display: contents;
+        }
+        .author_img {
+            width: 300px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <!--================Home Banner Area =================-->
+    <section class="home_banner_area">
+        <div class="container box_1620">
+            <div class="text-center align-items-center" style="min-height: unset;">
+                <div class="banner_content">
+                    <div class="personal_text">
+                        <form method="get" action="{{ url('search') }}" style="margin: 50px auto;max-width: 1000px">
+                            <input type="text" value="{{ phrase }}" name="phrase" id="text" class="form-control" required autofocus placeholder="{{ 'enter_name'|trans }}">
+                            <button class="btn btn-lg btn-primary mt-4" type="submit">{{ 'button_search'|trans }}</button>
+                        </form>
+                    </div>
+
+                    <div class="personal_text">
+                        <h3>{{ 'search_results'|trans }}</h3>
+                        {% if pagination is defined and pagination.items|length %}
+                            {% for user in pagination.items %}
+                                <div class="blog_right_sidebar" style="display: inline-table">
+                                    <aside class="single_sidebar_widget author_widget">
+                                        <img class="author_img rounded-circle" src="{{ asset('img/'~user.userInfo.avatar) }}" alt="">
+                                        <h4>{{ user.userInfo.lastname }} {{ user.userInfo.firstname }}</h4>
+                                        <p>{{ user.email }}</p>
+                                        <div class="social_icon">
+                                            <a href="#"><i class="fa fa-facebook"></i></a>
+                                            <a href="#"><i class="fa fa-twitter"></i></a>
+                                            <a href="#"><i class="fa fa-github"></i></a>
+                                            <a href="#"><i class="fa fa-behance"></i></a>
+                                        </div>
+                                        <div class="br"></div>
+                                    </aside>
+                                </div>
+                            {% endfor %}
+                            <div class="col-12 navigation text-center mt-5">
+                                {{ knp_pagination_render(pagination) }}
+                            </div>
+                        {% else %}
+                            <div class="jumbotron jumbotron-fluid mt-5">
+                                <div class="container">
+                                    <h1 class="display-4">{{ 'no_results_title'|trans }}</h1>
+                                    <p class="lead">{{ 'no_results_content'|trans }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--================End Home Banner Area =================-->
+{% endblock %}

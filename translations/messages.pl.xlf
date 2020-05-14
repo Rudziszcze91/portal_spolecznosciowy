@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="title_index">
+                <source>title_index</source>
+                <target>Strona główna</target>
+            </trans-unit>
+            <trans-unit id="title">
+                <source>title</source>
+                <target>Portal społecznościowy</target>
+            </trans-unit>
+            <trans-unit id="button_search">
+                <source>button_search</source>
+                <target>szukaj!</target>
+            </trans-unit>
+            <trans-unit id="enter_name">
+                <source>enter_name</source>
+                <target>Szukaj znajomych po imieniu lub nazwisku</target>
+            </trans-unit>
+            <trans-unit id="button_search11">
+                <source>button_search11</source>
+                <target>szukaj!</target>
+            </trans-unit>
+            <trans-unit id="title_search">
+                <source>title_search</source>
+                <target>Wyszukaj</target>
+            </trans-unit>
+            <trans-unit id="search_results">
+                <source>search_results</source>
+                <target>Wyniki wyszukiwania</target>
+            </trans-unit>
+            <trans-unit id="no_results_title">
+                <source>no_results_title</source>
+                <target>Brak wyników</target>
+            </trans-unit>
+            <trans-unit id="no_results_content">
+                <source>no_results_content</source>
+                <target>Nie znaleziono wyników, zmień frazę wyszukiwania i spróbuj ponownie!</target>
+            </trans-unit>
+            <trans-unit id="logout">
+                <source>logout</source>
+                <target>Wyloguj</target>
+            </trans-unit>
+            <trans-unit id="login">
+                <source>login</source>
+                <target>Zaloguj się</target>
+            </trans-unit>
+            <trans-unit id="register">
+                <source>register</source>
+                <target>Zarejestruj się</target>
+            </trans-unit>
+            <trans-unit id="index_lead">
+                <source>index_lead</source>
+                <target>Witaj na stronie projektu php</target>
+            </trans-unit>
+            <trans-unit id="index_title">
+                <source>index_title</source>
+                <target>Portal społecznościowy</target>
+            </trans-unit>
+            <trans-unit id="index_message">
+                <source>index_message</source>
+                <target>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores dolorum explicabo fugiat harum impedit ipsum iste mollitia quibusdam, quos sapiente sunt tenetur totam voluptate? Alias at eos minima omnis quas! Lorem ipsum dolor sit amet, consectetur adipisicing elit. Atque blanditiis earum inventore ipsa quis ratione reiciendis soluta! Adipisci dolores enim in ipsum, quasi voluptate. Beatae doloribus error nesciunt officia rem?</target>
+            </trans-unit>
+            <trans-unit id="email">
+                <source>email</source>
+                <target>Email</target>
+            </trans-unit>
+            <trans-unit id="password">
+                <source>password</source>
+                <target>Hasło</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

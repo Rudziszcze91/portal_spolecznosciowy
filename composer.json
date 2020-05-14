@@ -34,6 +34,7 @@
         "twig/intl-extra": "^3.0"
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.3",
         "escapestudios/symfony2-coding-standard": "^3.11",
         "fzaninotto/faker": "^1.9",
         "jms/serializer": "1.7.*",

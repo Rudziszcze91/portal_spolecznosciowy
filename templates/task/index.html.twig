@@ -7,7 +7,6 @@
 {% block body %}
     <h1>{{ 'title_task_list'|trans }}</h1>
     {% if pagination is defined and pagination.items|length %}
-
         <div class="navigation text-center">
             {{ knp_pagination_render(pagination) }}
         </div>

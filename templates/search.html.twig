@@ -48,6 +48,8 @@
                                             <a href="#"><i class="fa fa-behance"></i></a>
                                         </div>
                                         <div class="br"></div>
+                                        <a href="{{ url('profile', {'id': user.id}) }}" class="pull-left btn btn-sm btn-success"><i class="fa fa-search"></i> {{ 'show_profile'|trans }}</a>
+                                        <a href="" class="pull-right btn btn-sm btn-primary"><i class="fa fa-plus"></i> {{ 'add_friends'|trans }}</a>
                                     </aside>
                                 </div>
                             {% endfor %}

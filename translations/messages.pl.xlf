@@ -70,6 +70,26 @@
                 <source>password</source>
                 <target>Hasło</target>
             </trans-unit>
+            <trans-unit id="show_profile">
+                <source>show_profile</source>
+                <target>zobacz profil</target>
+            </trans-unit>
+            <trans-unit id="add_friends">
+                <source>add_friends</source>
+                <target>dodaj do znajomych</target>
+            </trans-unit>
+            <trans-unit id="profile_lead">
+                <source>profile_lead</source>
+                <target>profil użytkownika</target>
+            </trans-unit>
+            <trans-unit id="quantity_of_friends">
+                <source>quantity_of_friends</source>
+                <target>liczba znajomych</target>
+            </trans-unit>
+            <trans-unit id="quantity_of_posts">
+                <source>quantity_of_posts</source>
+                <target>ilość postów</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

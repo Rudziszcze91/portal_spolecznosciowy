@@ -5,6 +5,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -34,7 +36,7 @@ class User implements UserInterface
      *
      * @constant int
      */
-    const PAGINATOR_ITEMS_PER_PAGE = 3;
+    const PAGINATOR_ITEMS_PER_PAGE = 12;
 
     /**
      * Role user.
@@ -99,6 +101,16 @@ class User implements UserInterface
      * @ORM\OneToOne(targetEntity="App\Entity\UserInfo", mappedBy="user", cascade={"persist", "remove"})
      */
     private $userInfo;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Post", mappedBy="user", orphanRemoval=true)
+     */
+    private $posts;
+
+    public function __construct()
+    {
+        $this->posts = new ArrayCollection();
+    }
 
     /**
      * Getter for the Id.
@@ -219,6 +231,37 @@ class User implements UserInterface
         // set the owning side of the relation if necessary
         if ($userInfo->getUser() !== $this) {
             $userInfo->setUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Post[]
+     */
+    public function getPosts(): Collection
+    {
+        return $this->posts;
+    }
+
+    public function addPost(Post $post): self
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts[] = $post;
+            $post->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePost(Post $post): self
+    {
+        if ($this->posts->contains($post)) {
+            $this->posts->removeElement($post);
+            // set the owning side to null (unless already changed)
+            if ($post->getUser() === $this) {
+                $post->setUser(null);
+            }
         }
 
         return $this;

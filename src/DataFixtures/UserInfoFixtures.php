@@ -8,7 +8,6 @@ namespace App\DataFixtures;
 use App\Entity\UserInfo;
 use App\Repository\UserRepository;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * Class UserInfoFixtures.

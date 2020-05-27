@@ -51,6 +51,17 @@
             </div>
         </header>
         <!--================Header Menu Area =================-->
+        {% if app.session.flashBag.peekAll is defined and app.session.flashBag.peekAll is not empty %}
+            <div class="messages" style="position: absolute;top: 100px;width: 100%;z-index: 999;">
+                {% for type, messages in app.session.flashBag.all %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ type }}" role="alert">
+                            {{ message|trans }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endif %}
 
         {% block body %}{% endblock %}
 

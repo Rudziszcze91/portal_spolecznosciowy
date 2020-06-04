@@ -107,9 +107,21 @@ class User implements UserInterface
      */
     private $posts;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Friend", mappedBy="fromUser", orphanRemoval=true)
+     */
+    private $fromFriends;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Friend", mappedBy="toUser", orphanRemoval=true)
+     */
+    private $toFriends;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
+        $this->fromFriends = new ArrayCollection();
+        $this->toFriends = new ArrayCollection();
     }
 
     /**
@@ -261,6 +273,68 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($post->getUser() === $this) {
                 $post->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Friend[]
+     */
+    public function getFromFriends(): Collection
+    {
+        return $this->fromFriends;
+    }
+
+    public function addFromFriend(Friend $fromFriend): self
+    {
+        if (!$this->fromFriends->contains($fromFriend)) {
+            $this->fromFriends[] = $fromFriend;
+            $fromFriend->setFromUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFromFriend(Friend $fromFriend): self
+    {
+        if ($this->fromFriends->contains($fromFriend)) {
+            $this->fromFriends->removeElement($fromFriend);
+            // set the owning side to null (unless already changed)
+            if ($fromFriend->getFromUser() === $this) {
+                $fromFriend->setFromUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Friend[]
+     */
+    public function getToFriends(): Collection
+    {
+        return $this->toFriends;
+    }
+
+    public function addToFriend(Friend $toFriend): self
+    {
+        if (!$this->toFriends->contains($toFriend)) {
+            $this->toFriends[] = $toFriend;
+            $toFriend->setToUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeToFriend(Friend $toFriend): self
+    {
+        if ($this->toFriends->contains($toFriend)) {
+            $this->toFriends->removeElement($toFriend);
+            // set the owning side to null (unless already changed)
+            if ($toFriend->getToUser() === $this) {
+                $toFriend->setToUser(null);
             }
         }
 

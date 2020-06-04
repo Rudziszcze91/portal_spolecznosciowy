@@ -71,6 +71,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
+     * Query all records.
+     *
+     * @return \Doctrine\ORM\QueryBuilder Query builder
+     */
+    public function getFriends($user): QueryBuilder
+    {
+        return $this->getOrCreateQueryBuilder()
+            ->join('user.userInfo', 'info')
+            ->orWhere('user.fromFriends = :from')
+            ->orWhere('user.toFriends = :from')
+            ->setParameter('from', $user)
+            ->orderBy('user.lastname', 'ASC');
+    }
+
+    /**
      * Get or create new query builder.
      *
      * @param \Doctrine\ORM\QueryBuilder|null $queryBuilder Query builder

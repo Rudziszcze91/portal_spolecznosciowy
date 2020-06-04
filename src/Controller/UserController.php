@@ -5,9 +5,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Friend;
 use App\Entity\Post;
 use App\Entity\User;
 use App\Form\PostType;
+use App\Repository\FriendRepository;
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
 use Knp\Component\Pager\PaginatorInterface;
@@ -25,8 +27,8 @@ class UserController extends AbstractController
     /**
      * Profile action.
      *
-     * @param Request        $request        HTTP request
-     * @param User           $user           User
+     * @param Request $request HTTP request
+     * @param User $user User
      * @param PostRepository $postRepository Post Repository
      *
      * @return \Symfony\Component\HttpFoundation\Response HTTP response
@@ -76,9 +78,9 @@ class UserController extends AbstractController
     /**
      * Search action.
      *
-     * @param Request            $request        HTTP request
-     * @param UserRepository     $userRepository HTTP request
-     * @param PaginatorInterface $paginator      Paginator
+     * @param Request $request HTTP request
+     * @param UserRepository $userRepository HTTP request
+     * @param PaginatorInterface $paginator Paginator
      *
      * @return Response HTTP response
      *
@@ -102,6 +104,113 @@ class UserController extends AbstractController
             [
                 'pagination' => $pagination,
                 'phrase' => $phrase,
+            ]
+        );
+    }
+
+    /**
+     * Search action.
+     *
+     * @param Request $request HTTP request
+     * @param UserRepository $userRepository HTTP request
+     * @param PaginatorInterface $paginator Paginator
+     *
+     * @return Response HTTP response
+     *
+     * @Route(
+     *     "/add/friend/{id}",
+     *     methods={"GET"},
+     *     name="add_friend",
+     * )
+     */
+    public function addFriend(Request $request, User $user, FriendRepository $friendRepository): Response
+    {
+        $currentUser = $this->getUser();
+        if ($currentUser === null) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $connection = $friendRepository->getFriendConnection($currentUser, $user);
+        if ($connection !== null)  {
+            $this->addFlash('danger', 'message_add_friend_failed');
+
+            return $this->redirectToRoute('profile', ['id' => $user->getId()]);
+        }
+
+        $connection = new Friend();
+        $connection->setAccepted(false);
+        $connection->setFromUser($currentUser);
+        $connection->setToUser($user);
+        $friendRepository->save($connection);
+
+        $this->addFlash('success', 'message_add_friend_success');
+
+        return $this->redirectToRoute('profile', ['id' => $user->getId()]);
+    }
+
+    /**
+     * Search action.
+     *
+     * @param Request $request HTTP request
+     * @param UserRepository $userRepository HTTP request
+     * @param PaginatorInterface $paginator Paginator
+     *
+     * @return Response HTTP response
+     *
+     * @Route(
+     *     "/accept/friend/{id}",
+     *     methods={"GET"},
+     *     name="accept_friend",
+     * )
+     */
+    public function acceptFriend(Request $request, User $user, FriendRepository $friendRepository): Response
+    {
+        $currentUser = $this->getUser();
+        if ($currentUser === null) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $invitation = $friendRepository->getInvitation($user, $currentUser); //musi przyjść od kogoś do zalogowanego
+        if ($invitation === null || $invitation->getAccepted() === true)  {
+            return $this->redirectToRoute('profile', ['id' => $user->getId()]);
+        }
+
+        $invitation->setAccepted(true);
+        $friendRepository->save($invitation);
+        $this->addFlash('success', 'message_accept_friend_success');
+
+        return $this->redirectToRoute('profile', ['id' => $user->getId()]);
+    }
+
+    /**
+     * Search action.
+     *
+     * @param Request $request HTTP request
+     * @param UserRepository $userRepository HTTP request
+     * @param PaginatorInterface $paginator Paginator
+     *
+     * @return Response HTTP response
+     *
+     * @Route(
+     *     "/{id}/friends",
+     *     methods={"GET"},
+     *     name="friends",
+     * )
+     */
+    public function friends(Request $request, User $user, UserRepository $userRepository, PaginatorInterface $paginator): Response
+    {
+        $phrase = $request->query->get('phrase');
+        $pagination = $paginator->paginate(
+            $userRepository->getFriends($user),
+            $request->query->getInt('page', 1),
+            User::PAGINATOR_ITEMS_PER_PAGE
+        );
+
+        return $this->render(
+            'search.html.twig',
+            [
+                'pagination' => $pagination,
+                'phrase' => $user->getId(),
             ]
         );
     }

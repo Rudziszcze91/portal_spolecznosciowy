@@ -5,7 +5,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
+use App\Entity\Post;
 use App\Entity\User;
+use App\Form\CommentType;
+use App\Repository\CommentRepository;
+use App\Repository\FriendRepository;
 use App\Repository\UserRepository;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -54,7 +59,7 @@ class WebController extends AbstractController
      *     name="search",
      * )
      */
-    public function search(Request $request, UserRepository $userRepository, PaginatorInterface $paginator): Response
+    public function search(Request $request, UserRepository $userRepository, FriendRepository $friendRepository, PaginatorInterface $paginator): Response
     {
         $phrase = $request->query->get('phrase');
         $pagination = $paginator->paginate(
@@ -67,7 +72,53 @@ class WebController extends AbstractController
             'search.html.twig',
             [
                 'pagination' => $pagination,
+                'friendRepository' => $friendRepository,
                 'phrase' => $phrase,
+            ]
+        );
+    }
+
+    /**
+     * add comment action.
+     *
+     * @param Request           $request           HTTP request
+     * @param Post              $post              Post
+     * @param CommentRepository $commentRepository Post Repository
+     *
+     * @return \Symfony\Component\HttpFoundation\Response HTTP response
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     *
+     * @Route(
+     *     "/{id}/comment/add",
+     *     methods={"GET", "POST"},
+     *     name="add_comment",
+     *     requirements={"id": "[1-9]\d*"},
+     * )
+     */
+    public function addComment(Request $request, Post $post, CommentRepository $commentRepository): Response
+    {
+        $comment = new Comment();
+        $form = $this->createForm(CommentType::class, $comment);
+        $form->handleRequest($request);
+        $logged = $this->getUser();
+        dump($logged);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $comment->setUser($logged);
+            $comment->setPost($post);
+            $commentRepository->save($comment);
+            $this->addFlash('success', 'message_created_successfully');
+
+            return $this->redirectToRoute('profile', ['id' => $post->getUser()->getId()]);
+        }
+
+        return $this->render(
+            'comment/add.html.twig',
+            [
+                'post' => $post,
+                'form' => $form->createView(),
             ]
         );
     }

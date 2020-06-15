@@ -26,21 +26,15 @@
             <div class="text-center align-items-center" style="min-height: unset;">
                 <div class="banner_content">
                     <div class="personal_text">
-                        <form method="get" action="{{ url('search') }}" style="margin: 50px auto;max-width: 1000px">
-                            <input type="text" value="{{ phrase }}" name="phrase" id="text" class="form-control" required autofocus placeholder="{{ 'enter_name'|trans }}">
-                            <button class="btn btn-lg btn-primary mt-4" type="submit">{{ 'button_search'|trans }}</button>
-                        </form>
-                    </div>
-
-                    <div class="personal_text">
-                        <h3>{{ 'search_results'|trans }}</h3>
+                        <h3>{{ 'users_friends'|trans }} {{ user.userInfo.firstname }} {{ user.userInfo.lastname }}</h3>
                         {% if pagination is defined and pagination.items|length %}
-                            {% for user in pagination.items %}
+                            {% for connection in pagination.items %}
+                                {% set friend = connection.fromUser == user ? connection.toUser : connection.fromUser %}
                                 <div class="blog_right_sidebar" style="display: inline-table">
                                     <aside class="single_sidebar_widget author_widget">
-                                        <img class="author_img rounded-circle" src="{{ asset('img/'~user.userInfo.avatar) }}" alt="">
-                                        <h4>{{ user.userInfo.lastname }} {{ user.userInfo.firstname }}</h4>
-                                        <p>{{ user.email }}</p>
+                                        <img class="author_img rounded-circle" src="{{ asset('img/'~friend.userInfo.avatar) }}" alt="">
+                                        <h4>{{ friend.userInfo.lastname }} {{ friend.userInfo.firstname }}</h4>
+                                        <p>{{ friend.email }}</p>
                                         <div class="social_icon">
                                             <a href="#"><i class="fa fa-facebook"></i></a>
                                             <a href="#"><i class="fa fa-twitter"></i></a>
@@ -48,9 +42,11 @@
                                             <a href="#"><i class="fa fa-behance"></i></a>
                                         </div>
                                         <div class="br"></div>
-                                        <a href="{{ url('profile', {'id': user.id}) }}" class="pull-left btn btn-sm btn-success"><i class="fa fa-search"></i> {{ 'show_profile'|trans }}</a>
-                                        {% if app.user and not friendRepository.getFriendConnection(app.user, user) %}
-                                            <a href="{{ url("add_friend", {'id': user.id}) }}" class="pull-right btn btn-sm btn-primary"><i class="fa fa-plus"></i> {{ 'add_friends'|trans }}</a>
+                                        <a href="{{ url('profile', {'id': friend.id}) }}" class="pull-left btn btn-sm btn-success"><i class="fa fa-search"></i> {{ 'show_profile'|trans }}</a>
+                                        {% if app.user and app.user != friend %}
+                                            {% if not friendRepository.getFriendConnection(app.user, friend) %}
+                                                <a href="{{ url("add_friend", {'id': friend.id}) }}" class="pull-right btn btn-sm btn-primary"><i class="fa fa-plus"></i> {{ 'add_friends'|trans }}</a>
+                                            {% endif %}
                                         {% endif %}
                                     </aside>
                                 </div>
@@ -62,7 +58,7 @@
                             <div class="jumbotron jumbotron-fluid mt-5">
                                 <div class="container">
                                     <h1 class="display-4">{{ 'no_results_title'|trans }}</h1>
-                                    <p class="lead">{{ 'no_results_content'|trans }}</p>
+                                    <p class="lead">{{ 'no_results_friends_content'|trans }}</p>
                                 </div>
                             </div>
                         {% endif %}

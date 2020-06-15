@@ -62,14 +62,25 @@ class FriendRepository extends ServiceEntityRepository
      * Query all records.
      *
      */
-    public function getFriendConnection($user1, $user2)
+    public function getFriendConnection($user1, $user2, $accepted = null)
+    {
+        return $this->getFriendConnectionQuery($user1, $user2, $accepted)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Query all records.
+     *
+     */
+    public function getFriendConnectionQuery($user1, $user2, $accepted = null)
     {
         return $this->getOrCreateQueryBuilder()
             ->andWhere('(friend.fromUser = :from AND friend.toUser = :to) OR (friend.fromUser = :to AND friend.toUser = :from)')
+            ->andWhere('friend.accepted IN (:accepted)')
             ->setParameter('from', $user1)
             ->setParameter('to', $user2)
-            ->getQuery()
-            ->getOneOrNullResult();
+            ->setParameter('accepted', $accepted ? [$accepted] : [0,1]);
     }
 
     /**
@@ -85,6 +96,30 @@ class FriendRepository extends ServiceEntityRepository
             ->setParameter('to', $to)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * Query all records.
+     *
+     */
+    public function getFriends($user)
+    {
+        return $this->getOrCreateQueryBuilder()
+            ->andWhere('(friend.fromUser = :user) OR (friend.toUser = :user)')
+            ->andWhere('friend.accepted = 1')
+            ->setParameter('user', $user);
+    }
+
+    /**
+     * Query all records.
+     *
+     */
+    public function getInvitations($user)
+    {
+        return $this->getOrCreateQueryBuilder()
+            ->andWhere('friend.toUser = :to')
+            ->andWhere('friend.accepted = 0')
+            ->setParameter('to', $user);
     }
 
     /**

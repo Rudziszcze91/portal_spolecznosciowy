@@ -117,11 +117,17 @@ class User implements UserInterface
      */
     private $toFriends;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Comment", mappedBy="user", orphanRemoval=true)
+     */
+    private $comments;
+
     public function __construct()
     {
         $this->posts = new ArrayCollection();
         $this->fromFriends = new ArrayCollection();
         $this->toFriends = new ArrayCollection();
+        $this->comments = new ArrayCollection();
     }
 
     /**
@@ -335,6 +341,37 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($toFriend->getToUser() === $this) {
                 $toFriend->setToUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Comment[]
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments[] = $comment;
+            $comment->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): self
+    {
+        if ($this->comments->contains($comment)) {
+            $this->comments->removeElement($comment);
+            // set the owning side to null (unless already changed)
+            if ($comment->getUser() === $this) {
+                $comment->setUser(null);
             }
         }
 

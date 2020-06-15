@@ -40,14 +40,14 @@ class UserController extends AbstractController
      *     requirements={"id": "[1-9]\d*"},
      * )
      */
-    public function profile(Request $request, User $user, PostRepository $postRepository, PaginatorInterface $paginator): Response
+    public function profile(Request $request, User $user, PostRepository $postRepository, FriendRepository $friendRepository, PaginatorInterface $paginator): Response
     {
         $post = new Post();
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
         $logged = $this->getUser();
         $pagination = $paginator->paginate(
-            $postRepository->queryAll(),
+            $postRepository->userPosts($user),
             $request->query->getInt('page', 1),
             Post::PAGINATOR_ITEMS_PER_PAGE
         );
@@ -64,46 +64,17 @@ class UserController extends AbstractController
 
             return $this->redirectToRoute('profile', ['id' => $user->getId()]);
         }
+        $connection = $logged === $user ? null : $friendRepository->getFriendConnection($user, $logged);
+        $friendsNumber = count($friendRepository->getFriends($user)->getQuery()->getResult());
 
         return $this->render(
             'profile.html.twig',
             [
                 'user' => $user,
                 'form' => $form->createView(),
+                'connection' => $connection,
                 'pagination' => $pagination,
-            ]
-        );
-    }
-
-    /**
-     * Search action.
-     *
-     * @param Request $request HTTP request
-     * @param UserRepository $userRepository HTTP request
-     * @param PaginatorInterface $paginator Paginator
-     *
-     * @return Response HTTP response
-     *
-     * @Route(
-     *     "/search",
-     *     methods={"GET"},
-     *     name="search",
-     * )
-     */
-    public function search(Request $request, UserRepository $userRepository, PaginatorInterface $paginator): Response
-    {
-        $phrase = $request->query->get('phrase');
-        $pagination = $paginator->paginate(
-            $userRepository->searchUsers($phrase),
-            $request->query->getInt('page', 1),
-            User::PAGINATOR_ITEMS_PER_PAGE
-        );
-
-        return $this->render(
-            'search.html.twig',
-            [
-                'pagination' => $pagination,
-                'phrase' => $phrase,
+                'friendsNumber' => $friendsNumber,
             ]
         );
     }
@@ -131,7 +102,7 @@ class UserController extends AbstractController
         }
 
         $connection = $friendRepository->getFriendConnection($currentUser, $user);
-        if ($connection !== null)  {
+        if ($connection !== null || $user === $currentUser)  {
             $this->addFlash('danger', 'message_add_friend_failed');
 
             return $this->redirectToRoute('profile', ['id' => $user->getId()]);
@@ -158,13 +129,17 @@ class UserController extends AbstractController
      * @return Response HTTP response
      *
      * @Route(
-     *     "/accept/friend/{id}",
+     *     "/{type}/friend/{id}",
      *     methods={"GET"},
-     *     name="accept_friend",
+     *     name="manage_friend",
      * )
      */
-    public function acceptFriend(Request $request, User $user, FriendRepository $friendRepository): Response
+    public function acceptFriend(Request $request, $type, User $user, FriendRepository $friendRepository): Response
     {
+        if ($type !== 'accept' && $type !== 'decline') {
+            return $this->redirectToRoute('profile', ['id' => $user->getId()]);
+        }
+
         $currentUser = $this->getUser();
         if ($currentUser === null) {
             return $this->redirectToRoute('app_login');
@@ -175,9 +150,15 @@ class UserController extends AbstractController
             return $this->redirectToRoute('profile', ['id' => $user->getId()]);
         }
 
-        $invitation->setAccepted(true);
-        $friendRepository->save($invitation);
-        $this->addFlash('success', 'message_accept_friend_success');
+        if ($type === 'accept') {
+            $invitation->setAccepted(true);
+            $friendRepository->save($invitation);
+            $this->addFlash('success', 'message_accept_friend_success');
+        } else {
+            $friendRepository->delete($invitation);
+            $this->addFlash('success', 'message_decline_friend_success');
+        }
+
 
         return $this->redirectToRoute('profile', ['id' => $user->getId()]);
     }
@@ -186,7 +167,7 @@ class UserController extends AbstractController
      * Search action.
      *
      * @param Request $request HTTP request
-     * @param UserRepository $userRepository HTTP request
+     * @param FriendRepository $friendRepository HTTP request
      * @param PaginatorInterface $paginator Paginator
      *
      * @return Response HTTP response
@@ -197,20 +178,52 @@ class UserController extends AbstractController
      *     name="friends",
      * )
      */
-    public function friends(Request $request, User $user, UserRepository $userRepository, PaginatorInterface $paginator): Response
+    public function friends(Request $request, User $user, FriendRepository $friendRepository, PaginatorInterface $paginator): Response
     {
-        $phrase = $request->query->get('phrase');
         $pagination = $paginator->paginate(
-            $userRepository->getFriends($user),
+            $friendRepository->getFriends($user),
             $request->query->getInt('page', 1),
             User::PAGINATOR_ITEMS_PER_PAGE
         );
 
         return $this->render(
-            'search.html.twig',
+            'friends.html.twig',
             [
                 'pagination' => $pagination,
-                'phrase' => $user->getId(),
+                'user' => $user,
+                'friendRepository' => $friendRepository
+            ]
+        );
+    }
+
+    /**
+     * Search action.
+     *
+     * @param Request $request HTTP request
+     * @param FriendRepository $friendRepository HTTP request
+     * @param PaginatorInterface $paginator Paginator
+     *
+     * @return Response HTTP response
+     *
+     * @Route(
+     *     "/friend/requests",
+     *     methods={"GET"},
+     *     name="friend_requests",
+     * )
+     */
+    public function friendRequests(Request $request, FriendRepository $friendRepository, PaginatorInterface $paginator): Response
+    {
+        $user = $this->getUser();
+        $pagination = $paginator->paginate(
+            $friendRepository->getInvitations($user),
+            $request->query->getInt('page', 1),
+            User::PAGINATOR_ITEMS_PER_PAGE
+        );
+
+        return $this->render(
+            'requests.html.twig',
+            [
+                'pagination' => $pagination
             ]
         );
     }

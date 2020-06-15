@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ 'add_comment'|trans }}
+{% endblock %}
+
+{% block body %}
+    <!--================Home Banner Area =================-->
+    <section class="home_banner_area">
+        <div class="container box_1620">
+            <div class="banner_inner d-flex align-items-center">
+                <div class="banner_content">
+                    <div class="media">
+                        <div class="media-body">
+                            <div class="personal_text">
+                                <h3>{{ post.name }}</h3>
+                                <p>{{ post.content }}</p>
+                                {{ form_start(form, { method: 'POST', action: url('add_comment', {'id': post.id}) }) }}
+                                {{ form_widget(form) }}
+                                <div class="form-group row float-sm-right">
+                                    <input type="submit" value="{{ 'action_save'|trans }}" class="btn btn-primary" />
+                                </div>
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--================End Home Banner Area =================-->
+{% endblock %}

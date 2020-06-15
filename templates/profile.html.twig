@@ -21,14 +21,27 @@
                                 <p> Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti eaque illum laboriosam laudantium mollitia necessitatibus nihil porro provident quae ut? Amet assumenda consequuntur deserunt dolore dolorem eius laborum praesentium, unde!</p>
                                 <ul class="list basic_info">
                                     <li><a href="#"><i class="lnr lnr-envelope"></i> {{ user.email }}</a></li>
-                                    <li><a href="#"><i class="lnr lnr-users"></i> {{ 'quantity_of_friends'|trans }}: <big><b>0</b></big></a></li>
+                                    <li><a href="#"><i class="lnr lnr-users"></i> {{ 'quantity_of_friends'|trans }}: <big><b>{{ friendsNumber }}</b></big></a></li>
                                     <li><a href="#"><i class="lnr lnr-pencil"></i> {{ 'quantity_of_posts'|trans }}: <big><b>{{ user.posts|length }}</b></big></a></li>
                                 </ul>
-                                <ul class="list personal_social">
-                                    <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-                                    <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-                                    <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
-                                </ul>
+                            </div>
+                            <div class="personal_text mt-10">
+                                {% if app.user %}
+                                    {% if user != app.user %}
+                                        {% if not connection|length %}
+                                            <a href="{{ url("add_friend", {'id': user.id}) }}" class="pull-left btn btn-sm btn-primary"><i class="fa fa-plus"></i> {{ 'add_friends'|trans }}</a>
+                                        {% elseif connection.accepted %}
+                                            <a href="" class="btn btn-sm btn-primary disabled">{{ 'your_friend'|trans }}</a>
+                                        {% else %}
+                                            <a href="" class="btn btn-sm btn-primary disabled">{{ 'request_sent'|trans }}</a>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="" class="btn btn-sm btn-primary disabled">{{ 'your_profile'|trans }}</a>
+                                        <a href="{{ url('friend_requests') }}" class="btn btn-sm btn-warning">{{ 'friend_requests'|trans }}</a>
+                                    {% endif %}
+                                    <a href="{{ url('friends', {'id': user.id}) }}" class="btn btn-sm btn-success">{{ 'friends'|trans }}</a>
+                                {% endif %}
+
                             </div>
                         </div>
                     </div>
@@ -41,17 +54,19 @@
     <!--================Welcome Area =================-->
     <section class="welcome_area p_120">
         <div class="container">
-            <div class="row welcome_inner">
-                <div class="col-12">
-                    <h3>Dodaj post</h3>
-                    {{ form_start(form, { method: 'POST' }) }}
-                    {{ form_widget(form) }}
-                    <div class="form-group row float-sm-right">
-                        <input type="submit" value="{{ 'action_save'|trans }}" class="btn btn-primary" />
+            {% if app.user and app.user != user %}
+                <div class="row welcome_inner">
+                    <div class="col-12">
+                        <h3>Dodaj post</h3>
+                        {{ form_start(form, { method: 'POST' }) }}
+                        {{ form_widget(form) }}
+                        <div class="form-group row float-sm-right">
+                            <input type="submit" value="{{ 'action_save'|trans }}" class="btn btn-primary" />
+                        </div>
+                        {{ form_end(form) }}
                     </div>
-                    {{ form_end(form) }}
                 </div>
-            </div>
+            {% endif %}
             {% if pagination is defined and pagination.items|length %}
                 <div class="row welcome_inner">
                     {% for post in pagination.items %}
@@ -59,6 +74,17 @@
                             <div class="welcome_text">
                                 <h4>{{ post.name }}</h4>
                                 <p><small>{{ post.createdAt|date("d.m.Y H:i") }}</small> - {{ post.content }}</p>
+                                {% if post.comments|length %}
+                                    <ul>
+                                        {% for comment in post.comments %}
+                                            <li>{{ comment.content }} - <a href="{{ url('profile', {'id': comment.user.id}) }}"><small>{{ comment.user.userInfo.firstname }} {{ comment.user.userInfo.lastname }}</small></a></li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                                    <a href="{{ url('add_comment', {'id': post.id}) }}" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> {{ 'add_comment'|trans }}</a>
+                                {% endif %}
+                                <hr>
                             </div>
                         </div>
                     {% endfor %}
@@ -66,7 +92,7 @@
                     <div class="jumbotron jumbotron-fluid mt-5">
                         <div class="container">
                             <h1 class="display-4">{{ 'no_results_title'|trans }}</h1>
-                            <p class="lead">{{ 'no_results__posts_content'|trans }}</p>
+                            <p class="lead">{{ 'no_results_posts_content'|trans }}</p>
                         </div>
                     </div>
                 </div>

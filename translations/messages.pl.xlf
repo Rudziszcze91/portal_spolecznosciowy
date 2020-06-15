@@ -90,6 +90,86 @@
                 <source>quantity_of_posts</source>
                 <target>ilość postów</target>
             </trans-unit>
+            <trans-unit id="my_profile">
+                <source>my_profile</source>
+                <target>Mój profil</target>
+            </trans-unit>
+            <trans-unit id="request_sent">
+                <source>request_sent</source>
+                <target>Zaproszenie zostało wysłane</target>
+            </trans-unit>
+            <trans-unit id="friend_requests">
+                <source>friend_requests</source>
+                <target>Osoby, które mnie zaprosiły</target>
+            </trans-unit>
+            <trans-unit id="friends">
+                <source>friends</source>
+                <target>znajomi</target>
+            </trans-unit>
+            <trans-unit id="users_requests">
+                <source>users_requests</source>
+                <target>Osoby, które mnie zaprosiły do znajomych</target>
+            </trans-unit>
+            <trans-unit id="your_friend">
+                <source>your_friend</source>
+                <target>Ten użytkownik jest Twoim znajomym</target>
+            </trans-unit>
+            <trans-unit id="your_profile">
+                <source>your_profile</source>
+                <target>mój profil</target>
+            </trans-unit>
+            <trans-unit id="add_comment">
+                <source>add_comment</source>
+                <target>dodaj komentarz</target>
+            </trans-unit>
+            <trans-unit id="label_name">
+                <source>label_name</source>
+                <target>Nazwa</target>
+            </trans-unit>
+            <trans-unit id="action_save">
+                <source>action_save</source>
+                <target>dodaj</target>
+            </trans-unit>
+            <trans-unit id="no_results_posts_content">
+                <source>no_results_posts_content</source>
+                <target>Nie znaleziono postów</target>
+            </trans-unit>
+            <trans-unit id="label_content">
+                <source>label_content</source>
+                <target>Treść</target>
+            </trans-unit>
+            <trans-unit id="users_friends">
+                <source>users_friends</source>
+                <target>Znajomi użytkownika</target>
+            </trans-unit>
+            <trans-unit id="no_results_friends_content">
+                <source>no_results_friends_content</source>
+                <target>Wybrany użytkownik nie posiada żadnych znajomych!</target>
+            </trans-unit>
+            <trans-unit id="message_created_successfully">
+                <source>message_created_successfully</source>
+                <target>Dodano pomyślnie</target>
+            </trans-unit>
+            <trans-unit id="message_created_failed">
+                <source>message_created_failed</source>
+                <target>Operacja nieudana</target>
+            </trans-unit>
+            <trans-unit id="message_add_friend_failed">
+                <source>message_add_friend_failed</source>
+                <target>Operacja nieudana</target>
+            </trans-unit>
+            <trans-unit id="message_accept_friend_success">
+                <source>message_accept_friend_success</source>
+                <target>Użytkownik zostal dodany do znajomych!</target>
+            </trans-unit>
+            <trans-unit id="message_add_friend_success">
+                <source>message_add_friend_success</source>
+                <target>Zaproszenie zostało wysłane</target>
+            </trans-unit>
+            <trans-unit id="message_decline_friend_success">
+                <source>message_decline_friend_success</source>
+                <target>Zaproszenie zostało usunięte</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

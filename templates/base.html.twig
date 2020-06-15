@@ -39,6 +39,7 @@
                         <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
                             <ul class="nav navbar-nav menu_nav ml-auto">
                                 {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
+                                    <li class="nav-item"><a class="nav-link" href="{{ url('profile', {'id': app.user.id}) }}">{{ 'my_profile'|trans }}</a></li>
                                     <li class="nav-item"><a class="nav-link" href="{{ url('app_logout') }}">{{ app.user.userInfo.firstname }}, {{ 'logout'|trans }}</a></li>
                                 {% else %}
                                     <li class="nav-item"><a class="nav-link" href="{{ url('app_login') }}">{{ 'login'|trans }}</a></li>

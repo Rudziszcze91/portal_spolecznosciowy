@@ -1,4 +1,7 @@
 <?php
+/**
+ * Comment
+ */
 
 namespace App\Entity;
 

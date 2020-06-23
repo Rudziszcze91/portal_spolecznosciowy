@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <!--================Home Banner Area =================-->
+    <section class="home_banner_area">
+        <div class="container box_1620">
+            <div class="banner_inner d-flex align-items-center">
+                <div class="banner_content">
+                    <div class="media">
+                        <div class="media-body">
+                            <div class="personal_text">
+                                <h3>{{ comment.post.name }}</h3>
+                                <p>{{ comment.content }}</p>
+                                {{ form_start(form, { method: 'DELETE', action: url('delete_comment', {'id': comment.id}) }) }}
+                                <div class="form-group row float-sm-right">
+                                    <input type="submit" value="{{ 'action_delete'|trans }}" class="btn btn-danger" />
+                                </div>
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--================End Home Banner Area =================-->
+{% endblock %}

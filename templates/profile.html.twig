@@ -77,12 +77,26 @@
                                 {% if post.comments|length %}
                                     <ul>
                                         {% for comment in post.comments %}
-                                            <li>{{ comment.content }} - <a href="{{ url('profile', {'id': comment.user.id}) }}"><small>{{ comment.user.userInfo.firstname }} {{ comment.user.userInfo.lastname }}</small></a></li>
+                                            <li>
+                                                {{ comment.content }}
+                                                -
+                                                <a href="{{ url('profile', {'id': comment.user.id}) }}">
+                                                    <small>{{ comment.user.userInfo.firstname }} {{ comment.user.userInfo.lastname }}</small>
+                                                </a>
+                                                {% if is_granted('ROLE_ADMIN') or app.user == comment.user %}
+                                                    <a href="{{ url('edit_comment', {'id': comment.id}) }}" class="btn btn-sm text-warning"><i class="fa fa-pencil"></i></a>
+                                                    <a href="{{ url('delete_comment', {'id': comment.id}) }}" class="btn btn-sm text-danger"><i class="fa fa-trash"></i></a>
+                                                {% endif %}
+                                            </li>
                                         {% endfor %}
                                     </ul>
                                 {% endif %}
                                 {% if is_granted('IS_AUTHENTICATED_REMEMBERED') %}
                                     <a href="{{ url('add_comment', {'id': post.id}) }}" class="btn btn-sm btn-success"><i class="fa fa-plus"></i> {{ 'add_comment'|trans }}</a>
+                                    {% if is_granted('ROLE_ADMIN') or app.user == post.user %}
+                                        <a href="{{ url('edit_post', {'id': post.id}) }}" class="btn btn-sm btn-warning"><i class="fa fa-pencil"></i> {{ 'edit_post'|trans }}</a>
+                                        <a href="{{ url('delete_post', {'id': post.id}) }}" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i> {{ 'delete_post'|trans }}</a>
+                                    {% endif %}
                                 {% endif %}
                                 <hr>
                             </div>

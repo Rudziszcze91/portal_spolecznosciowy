@@ -1,4 +1,7 @@
 <?php
+/**
+ * Post
+ */
 
 namespace App\Entity;
 
@@ -103,22 +106,36 @@ class Post
      */
     private $comments;
 
+    /**
+     * Post constructor.
+     */
     public function __construct()
     {
         $this->photos = new ArrayCollection();
         $this->comments = new ArrayCollection();
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return string|null
+     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -126,11 +143,19 @@ class Post
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getContent(): ?string
     {
         return $this->content;
     }
 
+    /**
+     * @param string $content
+     *
+     * @return $this
+     */
     public function setContent(string $content): self
     {
         $this->content = $content;
@@ -149,22 +174,32 @@ class Post
     }
 
     /**
-     * Setter for Created at.
+     * Setter for created At.
      *
      * @param \DateTimeInterface $createdAt Created at
+     *
+     * @return Post
      */
-    public function setCreatedAt(\DateTimeInterface $created_at): self
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
+    /**
+     * @return User|null
+     */
     public function getUser(): ?User
     {
         return $this->user;
     }
 
+    /**
+     * @param User|null $user
+     *
+     * @return $this
+     */
     public function setUser(?User $user): self
     {
         $this->user = $user;
@@ -180,6 +215,11 @@ class Post
         return $this->photos;
     }
 
+    /**
+     * @param Photo $photo
+     *
+     * @return $this
+     */
     public function addPhoto(Photo $photo): self
     {
         if (!$this->photos->contains($photo)) {
@@ -190,6 +230,11 @@ class Post
         return $this;
     }
 
+    /**
+     * @param Photo $photo
+     *
+     * @return $this
+     */
     public function removePhoto(Photo $photo): self
     {
         if ($this->photos->contains($photo)) {
@@ -211,6 +256,11 @@ class Post
         return $this->comments;
     }
 
+    /**
+     * @param Comment $comment
+     *
+     * @return $this
+     */
     public function addComment(Comment $comment): self
     {
         if (!$this->comments->contains($comment)) {
@@ -221,6 +271,11 @@ class Post
         return $this;
     }
 
+    /**
+     * @param Comment $comment
+     *
+     * @return $this
+     */
     public function removeComment(Comment $comment): self
     {
         if ($this->comments->contains($comment)) {

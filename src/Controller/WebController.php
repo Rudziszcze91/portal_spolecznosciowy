@@ -47,9 +47,10 @@ class WebController extends AbstractController
     /**
      * Search action.
      *
-     * @param Request            $request        HTTP request
-     * @param UserRepository     $userRepository HTTP request
-     * @param PaginatorInterface $paginator      Paginator
+     * @param Request            $request          HTTP request
+     * @param UserRepository     $userRepository   Repository
+     * @param FriendRepository   $friendRepository Repository
+     * @param PaginatorInterface $paginator        Paginator
      *
      * @return Response HTTP response
      *
@@ -103,7 +104,6 @@ class WebController extends AbstractController
         $form = $this->createForm(CommentType::class, $comment);
         $form->handleRequest($request);
         $logged = $this->getUser();
-        dump($logged);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $comment->setUser($logged);

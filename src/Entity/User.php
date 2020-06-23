@@ -1,6 +1,6 @@
 <?php
 /**
- * User entity.
+ * User.
  */
 
 namespace App\Entity;
@@ -122,6 +122,9 @@ class User implements UserInterface
      */
     private $comments;
 
+    /**
+     * User constructor.
+     */
     public function __construct()
     {
         $this->posts = new ArrayCollection();
@@ -237,11 +240,19 @@ class User implements UserInterface
         // $this->plainPassword = null;
     }
 
+    /**
+     * @return UserInfo|null
+     */
     public function getUserInfo(): ?UserInfo
     {
         return $this->userInfo;
     }
 
+    /**
+     * @param UserInfo $userInfo
+     *
+     * @return $this
+     */
     public function setUserInfo(UserInfo $userInfo): self
     {
         $this->userInfo = $userInfo;
@@ -262,6 +273,11 @@ class User implements UserInterface
         return $this->posts;
     }
 
+    /**
+     * @param Post $post
+     *
+     * @return $this
+     */
     public function addPost(Post $post): self
     {
         if (!$this->posts->contains($post)) {
@@ -272,6 +288,11 @@ class User implements UserInterface
         return $this;
     }
 
+    /**
+     * @param Post $post
+     *
+     * @return $this
+     */
     public function removePost(Post $post): self
     {
         if ($this->posts->contains($post)) {
@@ -293,6 +314,11 @@ class User implements UserInterface
         return $this->fromFriends;
     }
 
+    /**
+     * @param Friend $fromFriend
+     *
+     * @return $this
+     */
     public function addFromFriend(Friend $fromFriend): self
     {
         if (!$this->fromFriends->contains($fromFriend)) {
@@ -303,6 +329,11 @@ class User implements UserInterface
         return $this;
     }
 
+    /**
+     * @param Friend $fromFriend
+     *
+     * @return $this
+     */
     public function removeFromFriend(Friend $fromFriend): self
     {
         if ($this->fromFriends->contains($fromFriend)) {
@@ -324,6 +355,11 @@ class User implements UserInterface
         return $this->toFriends;
     }
 
+    /**
+     * @param Friend $toFriend
+     *
+     * @return $this
+     */
     public function addToFriend(Friend $toFriend): self
     {
         if (!$this->toFriends->contains($toFriend)) {
@@ -334,6 +370,11 @@ class User implements UserInterface
         return $this;
     }
 
+    /**
+     * @param Friend $toFriend
+     *
+     * @return $this
+     */
     public function removeToFriend(Friend $toFriend): self
     {
         if ($this->toFriends->contains($toFriend)) {
@@ -355,6 +396,11 @@ class User implements UserInterface
         return $this->comments;
     }
 
+    /**
+     * @param Comment $comment
+     *
+     * @return $this
+     */
     public function addComment(Comment $comment): self
     {
         if (!$this->comments->contains($comment)) {
@@ -365,6 +411,11 @@ class User implements UserInterface
         return $this;
     }
 
+    /**
+     * @param Comment $comment
+     *
+     * @return $this
+     */
     public function removeComment(Comment $comment): self
     {
         if ($this->comments->contains($comment)) {

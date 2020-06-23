@@ -1,4 +1,7 @@
 <?php
+/**
+ * User Info repository.
+ */
 
 namespace App\Repository;
 
@@ -14,6 +17,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class UserInfoRepository extends ServiceEntityRepository
 {
+    /**
+     * UserInfoRepository constructor.
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, UserInfo::class);

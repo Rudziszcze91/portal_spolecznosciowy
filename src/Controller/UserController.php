@@ -20,18 +20,22 @@ use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * Class UserController.
- *
  */
 class UserController extends AbstractController
 {
     /**
      * Profile action.
      *
-     * @param Request $request HTTP request
-     * @param User $user User
-     * @param PostRepository $postRepository Post Repository
+     * @param Request            $request          HTTP request
+     * @param User               $user             User
+     * @param PostRepository     $postRepository   Post Repository
+     * @param FriendRepository   $friendRepository Friend Repository
+     * @param PaginatorInterface $paginator        Paginator
      *
      * @return \Symfony\Component\HttpFoundation\Response HTTP response
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      *
      * @Route(
      *     "/{id}/profile",
@@ -75,155 +79,6 @@ class UserController extends AbstractController
                 'connection' => $connection,
                 'pagination' => $pagination,
                 'friendsNumber' => $friendsNumber,
-            ]
-        );
-    }
-
-    /**
-     * Search action.
-     *
-     * @param Request $request HTTP request
-     * @param UserRepository $userRepository HTTP request
-     * @param PaginatorInterface $paginator Paginator
-     *
-     * @return Response HTTP response
-     *
-     * @Route(
-     *     "/add/friend/{id}",
-     *     methods={"GET"},
-     *     name="add_friend",
-     * )
-     */
-    public function addFriend(Request $request, User $user, FriendRepository $friendRepository): Response
-    {
-        $currentUser = $this->getUser();
-        if ($currentUser === null) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        $connection = $friendRepository->getFriendConnection($currentUser, $user);
-        if ($connection !== null || $user === $currentUser)  {
-            $this->addFlash('danger', 'message_add_friend_failed');
-
-            return $this->redirectToRoute('profile', ['id' => $user->getId()]);
-        }
-
-        $connection = new Friend();
-        $connection->setAccepted(false);
-        $connection->setFromUser($currentUser);
-        $connection->setToUser($user);
-        $friendRepository->save($connection);
-
-        $this->addFlash('success', 'message_add_friend_success');
-
-        return $this->redirectToRoute('profile', ['id' => $user->getId()]);
-    }
-
-    /**
-     * Search action.
-     *
-     * @param Request $request HTTP request
-     * @param UserRepository $userRepository HTTP request
-     * @param PaginatorInterface $paginator Paginator
-     *
-     * @return Response HTTP response
-     *
-     * @Route(
-     *     "/{type}/friend/{id}",
-     *     methods={"GET"},
-     *     name="manage_friend",
-     * )
-     */
-    public function acceptFriend(Request $request, $type, User $user, FriendRepository $friendRepository): Response
-    {
-        if ($type !== 'accept' && $type !== 'decline') {
-            return $this->redirectToRoute('profile', ['id' => $user->getId()]);
-        }
-
-        $currentUser = $this->getUser();
-        if ($currentUser === null) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        $invitation = $friendRepository->getInvitation($user, $currentUser); //musi przyjść od kogoś do zalogowanego
-        if ($invitation === null || $invitation->getAccepted() === true)  {
-            return $this->redirectToRoute('profile', ['id' => $user->getId()]);
-        }
-
-        if ($type === 'accept') {
-            $invitation->setAccepted(true);
-            $friendRepository->save($invitation);
-            $this->addFlash('success', 'message_accept_friend_success');
-        } else {
-            $friendRepository->delete($invitation);
-            $this->addFlash('success', 'message_decline_friend_success');
-        }
-
-
-        return $this->redirectToRoute('profile', ['id' => $user->getId()]);
-    }
-
-    /**
-     * Search action.
-     *
-     * @param Request $request HTTP request
-     * @param FriendRepository $friendRepository HTTP request
-     * @param PaginatorInterface $paginator Paginator
-     *
-     * @return Response HTTP response
-     *
-     * @Route(
-     *     "/{id}/friends",
-     *     methods={"GET"},
-     *     name="friends",
-     * )
-     */
-    public function friends(Request $request, User $user, FriendRepository $friendRepository, PaginatorInterface $paginator): Response
-    {
-        $pagination = $paginator->paginate(
-            $friendRepository->getFriends($user),
-            $request->query->getInt('page', 1),
-            User::PAGINATOR_ITEMS_PER_PAGE
-        );
-
-        return $this->render(
-            'friends.html.twig',
-            [
-                'pagination' => $pagination,
-                'user' => $user,
-                'friendRepository' => $friendRepository
-            ]
-        );
-    }
-
-    /**
-     * Search action.
-     *
-     * @param Request $request HTTP request
-     * @param FriendRepository $friendRepository HTTP request
-     * @param PaginatorInterface $paginator Paginator
-     *
-     * @return Response HTTP response
-     *
-     * @Route(
-     *     "/friend/requests",
-     *     methods={"GET"},
-     *     name="friend_requests",
-     * )
-     */
-    public function friendRequests(Request $request, FriendRepository $friendRepository, PaginatorInterface $paginator): Response
-    {
-        $user = $this->getUser();
-        $pagination = $paginator->paginate(
-            $friendRepository->getInvitations($user),
-            $request->query->getInt('page', 1),
-            User::PAGINATOR_ITEMS_PER_PAGE
-        );
-
-        return $this->render(
-            'requests.html.twig',
-            [
-                'pagination' => $pagination
             ]
         );
     }

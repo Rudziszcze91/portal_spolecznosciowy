@@ -72,6 +72,9 @@ class PostRepository extends ServiceEntityRepository
     /**
      * Query all records.
      *
+     * @param \App\Entity\User $user User entity
+     *
+     * @return QueryBuilder
      */
     public function userPosts($user)
     {

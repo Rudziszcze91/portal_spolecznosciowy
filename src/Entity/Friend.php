@@ -1,4 +1,7 @@
 <?php
+/**
+ * Friend
+ */
 
 namespace App\Entity;
 
@@ -33,16 +36,27 @@ class Friend
      */
     private $toUser;
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return bool|null
+     */
     public function getAccepted(): ?bool
     {
         return $this->accepted;
     }
 
+    /**
+     * @param bool $accepted
+     *
+     * @return $this
+     */
     public function setAccepted(bool $accepted): self
     {
         $this->accepted = $accepted;
@@ -50,11 +64,19 @@ class Friend
         return $this;
     }
 
+    /**
+     * @return User|null
+     */
     public function getFromUser(): ?User
     {
         return $this->fromUser;
     }
 
+    /**
+     * @param User|null $fromUser
+     *
+     * @return $this
+     */
     public function setFromUser(?User $fromUser): self
     {
         $this->fromUser = $fromUser;
@@ -62,11 +84,19 @@ class Friend
         return $this;
     }
 
+    /**
+     * @return User|null
+     */
     public function getToUser(): ?User
     {
         return $this->toUser;
     }
 
+    /**
+     * @param User|null $toUser
+     *
+     * @return $this
+     */
     public function setToUser(?User $toUser): self
     {
         $this->toUser = $toUser;

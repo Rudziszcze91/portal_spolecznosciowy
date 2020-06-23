@@ -170,6 +170,42 @@
                 <source>message_decline_friend_success</source>
                 <target>Zaproszenie zostało usunięte</target>
             </trans-unit>
+            <trans-unit id="edit_comment">
+                <source>edit_comment</source>
+                <target>edytuj komentarz</target>
+            </trans-unit>
+            <trans-unit id="delete_comment">
+                <source>delete_comment</source>
+                <target>usuń komentarz</target>
+            </trans-unit>
+            <trans-unit id="edit_post">
+                <source>edit_post</source>
+                <target>edytuj post</target>
+            </trans-unit>
+            <trans-unit id="delete_post">
+                <source>delete_post</source>
+                <target>usuń post</target>
+            </trans-unit>
+            <trans-unit id="message_updated_successfully">
+                <source>message_updated_successfully</source>
+                <target>Zaktualizowano pomyślnie</target>
+            </trans-unit>
+            <trans-unit id="message_deleted_successfully">
+                <source>message_deleted_successfully</source>
+                <target>Usunięto pomyślnie</target>
+            </trans-unit>
+            <trans-unit id="operation_not_permitted">
+                <source>operation_not_permitted</source>
+                <target>Operacja niedozwolona</target>
+            </trans-unit>
+            <trans-unit id="action_edit">
+                <source>action_edit</source>
+                <target>Edytuj</target>
+            </trans-unit>
+            <trans-unit id="action_delete">
+                <source>action_delete</source>
+                <target>Usuń</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

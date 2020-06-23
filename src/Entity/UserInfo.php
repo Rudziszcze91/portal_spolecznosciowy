@@ -1,4 +1,7 @@
 <?php
+/**
+ * User Info
+ */
 
 namespace App\Entity;
 

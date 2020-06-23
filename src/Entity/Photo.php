@@ -1,4 +1,7 @@
 <?php
+/**
+ * Photo
+ */
 
 namespace App\Entity;
 
@@ -27,16 +30,27 @@ class Photo
      */
     private $post;
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @return string|null
+     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
+    /**
+     * @param string $name
+     *
+     * @return $this
+     */
     public function setName(string $name): self
     {
         $this->name = $name;
@@ -44,11 +58,19 @@ class Photo
         return $this;
     }
 
+    /**
+     * @return Post|null
+     */
     public function getPost(): ?Post
     {
         return $this->post;
     }
 
+    /**
+     * @param Post|null $post
+     *
+     * @return $this
+     */
     public function setPost(?Post $post): self
     {
         $this->post = $post;

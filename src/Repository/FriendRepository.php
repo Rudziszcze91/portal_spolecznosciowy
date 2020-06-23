@@ -61,6 +61,13 @@ class FriendRepository extends ServiceEntityRepository
     /**
      * Query all records.
      *
+     * @param \App\Entity\User $user1    User entity
+     * @param \App\Entity\User $user2    User entity
+     * @param boolean          $accepted accepted
+     *
+     * @return int|mixed|string|null
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getFriendConnection($user1, $user2, $accepted = null)
     {
@@ -72,6 +79,11 @@ class FriendRepository extends ServiceEntityRepository
     /**
      * Query all records.
      *
+     * @param \App\Entity\User $user1    User entity
+     * @param \App\Entity\User $user2    User entity
+     * @param boolean          $accepted accepted
+     *
+     * @return QueryBuilder
      */
     public function getFriendConnectionQuery($user1, $user2, $accepted = null)
     {
@@ -80,12 +92,18 @@ class FriendRepository extends ServiceEntityRepository
             ->andWhere('friend.accepted IN (:accepted)')
             ->setParameter('from', $user1)
             ->setParameter('to', $user2)
-            ->setParameter('accepted', $accepted ? [$accepted] : [0,1]);
+            ->setParameter('accepted', $accepted ? [$accepted] : [0, 1]);
     }
 
     /**
      * Query all records.
      *
+     * @param \App\Entity\User $from User entity
+     * @param \App\Entity\User $to   User entity
+     *
+     * @return int|mixed|string|null
+     *
+     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getInvitation($from, $to)
     {
@@ -101,6 +119,9 @@ class FriendRepository extends ServiceEntityRepository
     /**
      * Query all records.
      *
+     * @param \App\Entity\User $user User entity
+     *
+     * @return QueryBuilder
      */
     public function getFriends($user)
     {
@@ -113,6 +134,9 @@ class FriendRepository extends ServiceEntityRepository
     /**
      * Query all records.
      *
+     * @param \App\Entity\User $user User entity
+     *
+     * @return QueryBuilder
      */
     public function getInvitations($user)
     {

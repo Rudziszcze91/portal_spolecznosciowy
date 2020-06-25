@@ -7,7 +7,7 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Form\PostType;
-use App\Repository\PostRepository;
+use App\Service\PostService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,11 +20,27 @@ use Symfony\Component\Routing\Annotation\Route;
 class PostController extends AbstractController
 {
     /**
+     * Category service.
+     *
+     * @var \App\Service\PostService
+     */
+    private $postService;
+
+    /**
+     * CategoryController constructor.
+     *
+     * @param \App\Service\PostService $postService Post service
+     */
+    public function __construct(PostService $postService)
+    {
+        $this->postService = $postService;
+    }
+
+    /**
      * Edit action.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request        HTTP request
-     * @param \App\Entity\Post                          $post           Post entity
-     * @param \App\Repository\PostRepository            $postRepository Post repository
+     * @param \Symfony\Component\HttpFoundation\Request $request HTTP request
+     * @param \App\Entity\Post                          $post    Post entity
      *
      * @return \Symfony\Component\HttpFoundation\Response HTTP response
      *
@@ -38,10 +54,9 @@ class PostController extends AbstractController
      *     name="edit_post",
      * )
      */
-    public function edit(Request $request, Post $post, PostRepository $postRepository): Response
+    public function edit(Request $request, Post $post): Response
     {
-        $logged = $this->getUser();
-        if ($logged !== $post->getUser()) {
+        if (!$this->postService->checkUser($post->getUser())) {
             $this->addFlash('danger', 'operation_not_permitted');
 
             return $this->redirectToRoute('profile', ['id' => $post->getUser()->getId()]);
@@ -50,7 +65,7 @@ class PostController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $postRepository->save($post);
+            $this->postService->save($post);
             $this->addFlash('success', 'message_updated_successfully');
 
             return $this->redirectToRoute('profile', ['id' => $post->getUser()->getId()]);
@@ -68,9 +83,8 @@ class PostController extends AbstractController
     /**
      * Delete action.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request        HTTP request
-     * @param \App\Entity\Post                          $post           Post entity
-     * @param \App\Repository\PostRepository            $postRepository Post repository
+     * @param \Symfony\Component\HttpFoundation\Request $request HTTP request
+     * @param \App\Entity\Post                          $post    Post entity
      *
      * @return \Symfony\Component\HttpFoundation\Response HTTP response
      *
@@ -84,10 +98,9 @@ class PostController extends AbstractController
      *     name="delete_post",
      * )
      */
-    public function delete(Request $request, Post $post, PostRepository $postRepository): Response
+    public function delete(Request $request, Post $post): Response
     {
-        $logged = $this->getUser();
-        if ($logged !== $post->getUser()) {
+        if (!$this->postService->checkUser($post->getUser())) {
             $this->addFlash('danger', 'operation_not_permitted');
 
             return $this->redirectToRoute('profile', ['id' => $post->getUser()->getId()]);
@@ -100,7 +113,7 @@ class PostController extends AbstractController
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $postRepository->delete($post);
+            $this->postService->delete($post);
             $this->addFlash('success', 'message_deleted_successfully');
 
             return $this->redirectToRoute('profile', ['id' => $post->getUser()->getId()]);

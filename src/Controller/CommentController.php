@@ -6,8 +6,10 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Post;
 use App\Form\CommentType;
 use App\Repository\CommentRepository;
+use App\Service\CommentService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,11 +22,69 @@ use Symfony\Component\Routing\Annotation\Route;
 class CommentController extends AbstractController
 {
     /**
+     * Category service.
+     *
+     * @var \App\Service\CommentService
+     */
+    private $commentService;
+
+    /**
+     * CategoryController constructor.
+     *
+     * @param \App\Service\CommentService $commentService Comment service
+     */
+    public function __construct(CommentService $commentService)
+    {
+        $this->commentService = $commentService;
+    }
+
+    /**
+     * Add comment action.
+     *
+     * @param Request           $request           HTTP request
+     * @param Post              $post              Post
+     * @param CommentRepository $commentRepository Post Repository
+     *
+     * @return \Symfony\Component\HttpFoundation\Response HTTP response
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     *
+     * @Route(
+     *     "/{id}/comment/add",
+     *     methods={"GET", "POST"},
+     *     name="add_comment",
+     *     requirements={"id": "[1-9]\d*"},
+     * )
+     */
+    public function addComment(Request $request, Post $post, CommentRepository $commentRepository): Response
+    {
+        $comment = new Comment();
+        $form = $this->createForm(CommentType::class, $comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $comment->setPost($post);
+            $this->commentService->save($comment);
+            $this->addFlash('success', 'message_created_successfully');
+
+            return $this->redirectToRoute('profile', ['id' => $post->getUser()->getId()]);
+        }
+
+        return $this->render(
+            'comment/add.html.twig',
+            [
+                'post' => $post,
+                'form' => $form->createView(),
+            ]
+        );
+    }
+
+    /**
      * Edit action.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request           HTTP request
-     * @param \App\Entity\Comment                       $comment           Comment entity
-     * @param \App\Repository\CommentRepository         $commentRepository Comment repository
+     * @param \Symfony\Component\HttpFoundation\Request $request HTTP request
+     * @param \App\Entity\Comment                       $comment Comment entity
      *
      * @return \Symfony\Component\HttpFoundation\Response HTTP response
      *
@@ -38,10 +98,9 @@ class CommentController extends AbstractController
      *     name="edit_comment",
      * )
      */
-    public function edit(Request $request, Comment $comment, CommentRepository $commentRepository): Response
+    public function edit(Request $request, Comment $comment): Response
     {
-        $logged = $this->getUser();
-        if ($logged !== $comment->getUser()) {
+        if (!$this->commentService->checkUser($comment->getUser())) {
             $this->addFlash('danger', 'operation_not_permitted');
 
             return $this->redirectToRoute('profile', ['id' => $comment->getPost()->getUser()->getId()]);
@@ -50,7 +109,7 @@ class CommentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $commentRepository->save($comment);
+            $this->commentService->save($comment);
             $this->addFlash('success', 'message_updated_successfully');
 
             return $this->redirectToRoute('profile', ['id' => $comment->getPost()->getUser()->getId()]);
@@ -86,8 +145,7 @@ class CommentController extends AbstractController
      */
     public function delete(Request $request, Comment $comment, CommentRepository $commentRepository): Response
     {
-        $logged = $this->getUser();
-        if ($logged !== $comment->getUser()) {
+        if (!$this->commentService->checkUser($comment->getUser())) {
             $this->addFlash('danger', 'operation_not_permitted');
 
             return $this->redirectToRoute('profile', ['id' => $comment->getPost()->getUser()->getId()]);
@@ -100,7 +158,7 @@ class CommentController extends AbstractController
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $commentRepository->delete($comment);
+            $this->commentService->delete($comment);
             $this->addFlash('success', 'message_deleted_successfully');
 
             return $this->redirectToRoute('profile', ['id' => $comment->getPost()->getUser()->getId()]);

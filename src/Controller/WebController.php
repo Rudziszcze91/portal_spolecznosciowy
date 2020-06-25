@@ -5,14 +5,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Comment;
-use App\Entity\Post;
-use App\Entity\User;
-use App\Form\CommentType;
-use App\Repository\CommentRepository;
 use App\Repository\FriendRepository;
-use App\Repository\UserRepository;
-use Knp\Component\Pager\PaginatorInterface;
+use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,9 +19,24 @@ use Symfony\Component\Routing\Annotation\Route;
 class WebController extends AbstractController
 {
     /**
-     * Index action.
+     * Post service.
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request HTTP request
+     * @var \App\Service\UserService
+     */
+    private $userService;
+
+    /**
+     * CategoryController constructor.
+     *
+     * @param \App\Service\UserService $userService User service
+     */
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
+    /**
+     * Index action.
      *
      * @return \Symfony\Component\HttpFoundation\Response HTTP response
      *
@@ -37,7 +46,7 @@ class WebController extends AbstractController
      *     name="index",
      * )
      */
-    public function index(Request $request): Response
+    public function index(): Response
     {
         return $this->render(
             'index.html.twig'
@@ -47,10 +56,8 @@ class WebController extends AbstractController
     /**
      * Search action.
      *
-     * @param Request            $request          HTTP request
-     * @param UserRepository     $userRepository   Repository
-     * @param FriendRepository   $friendRepository Repository
-     * @param PaginatorInterface $paginator        Paginator
+     * @param Request          $request          HTTP request
+     * @param FriendRepository $friendRepository Repository
      *
      * @return Response HTTP response
      *
@@ -60,14 +67,11 @@ class WebController extends AbstractController
      *     name="search",
      * )
      */
-    public function search(Request $request, UserRepository $userRepository, FriendRepository $friendRepository, PaginatorInterface $paginator): Response
+    public function search(Request $request, FriendRepository $friendRepository): Response
     {
         $phrase = $request->query->get('phrase');
-        $pagination = $paginator->paginate(
-            $userRepository->searchUsers($phrase),
-            $request->query->getInt('page', 1),
-            User::PAGINATOR_ITEMS_PER_PAGE
-        );
+        $page = $request->query->getInt('page', 1);
+        $pagination = $this->userService->createPaginatedUsers($page, $phrase);
 
         return $this->render(
             'search.html.twig',
@@ -75,50 +79,6 @@ class WebController extends AbstractController
                 'pagination' => $pagination,
                 'friendRepository' => $friendRepository,
                 'phrase' => $phrase,
-            ]
-        );
-    }
-
-    /**
-     * add comment action.
-     *
-     * @param Request           $request           HTTP request
-     * @param Post              $post              Post
-     * @param CommentRepository $commentRepository Post Repository
-     *
-     * @return \Symfony\Component\HttpFoundation\Response HTTP response
-     *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     *
-     * @Route(
-     *     "/{id}/comment/add",
-     *     methods={"GET", "POST"},
-     *     name="add_comment",
-     *     requirements={"id": "[1-9]\d*"},
-     * )
-     */
-    public function addComment(Request $request, Post $post, CommentRepository $commentRepository): Response
-    {
-        $comment = new Comment();
-        $form = $this->createForm(CommentType::class, $comment);
-        $form->handleRequest($request);
-        $logged = $this->getUser();
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $comment->setUser($logged);
-            $comment->setPost($post);
-            $commentRepository->save($comment);
-            $this->addFlash('success', 'message_created_successfully');
-
-            return $this->redirectToRoute('profile', ['id' => $post->getUser()->getId()]);
-        }
-
-        return $this->render(
-            'comment/add.html.twig',
-            [
-                'post' => $post,
-                'form' => $form->createView(),
             ]
         );
     }

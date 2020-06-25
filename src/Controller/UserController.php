@@ -5,14 +5,11 @@
 
 namespace App\Controller;
 
-use App\Entity\Friend;
 use App\Entity\Post;
 use App\Entity\User;
 use App\Form\PostType;
-use App\Repository\FriendRepository;
-use App\Repository\PostRepository;
-use App\Repository\UserRepository;
-use Knp\Component\Pager\PaginatorInterface;
+use App\Service\FriendService;
+use App\Service\PostService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,13 +21,36 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends AbstractController
 {
     /**
+     * Post service.
+     *
+     * @var \App\Service\PostService
+     */
+    private $postService;
+
+    /**
+     * Friend service.
+     *
+     * @var \App\Service\FriendService
+     */
+    private $friendService;
+
+    /**
+     * CategoryController constructor.
+     *
+     * @param \App\Service\PostService   $postService   Post service
+     * @param \App\Service\FriendService $friendService Friend service
+     */
+    public function __construct(PostService $postService, FriendService $friendService)
+    {
+        $this->postService = $postService;
+        $this->friendService = $friendService;
+    }
+
+    /**
      * Profile action.
      *
-     * @param Request            $request          HTTP request
-     * @param User               $user             User
-     * @param PostRepository     $postRepository   Post Repository
-     * @param FriendRepository   $friendRepository Friend Repository
-     * @param PaginatorInterface $paginator        Paginator
+     * @param Request $request HTTP request
+     * @param User    $user    User
      *
      * @return \Symfony\Component\HttpFoundation\Response HTTP response
      *
@@ -44,17 +64,14 @@ class UserController extends AbstractController
      *     requirements={"id": "[1-9]\d*"},
      * )
      */
-    public function profile(Request $request, User $user, PostRepository $postRepository, FriendRepository $friendRepository, PaginatorInterface $paginator): Response
+    public function profile(Request $request, User $user): Response
     {
         $post = new Post();
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
         $logged = $this->getUser();
-        $pagination = $paginator->paginate(
-            $postRepository->userPosts($user),
-            $request->query->getInt('page', 1),
-            Post::PAGINATOR_ITEMS_PER_PAGE
-        );
+        $page = $request->query->getInt('page', 1);
+        $pagination = $this->postService->createPaginatedUsersPosts($page, $user);
 
         if ($form->isSubmitted() && $form->isValid()) {
             if ($logged === $user) {
@@ -62,14 +79,13 @@ class UserController extends AbstractController
 
                 return $this->redirectToRoute('profile', ['id' => $user->getId()]);
             }
-            $post->setUser($user);
-            $postRepository->save($post);
+            $this->postService->createPost($post, $user);
             $this->addFlash('success', 'message_created_successfully');
 
             return $this->redirectToRoute('profile', ['id' => $user->getId()]);
         }
-        $connection = $logged === $user ? null : $friendRepository->getFriendConnection($user, $logged);
-        $friendsNumber = count($friendRepository->getFriends($user)->getQuery()->getResult());
+        $connection = $this->friendService->getFriendConnection($user, $logged);
+        $friendsNumber = $this->friendService->countFriends($user);
 
         return $this->render(
             'profile.html.twig',

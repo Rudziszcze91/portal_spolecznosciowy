@@ -5,14 +5,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Friend;
-use App\Entity\Post;
 use App\Entity\User;
-use App\Form\PostType;
 use App\Repository\FriendRepository;
-use App\Repository\PostRepository;
-use App\Repository\UserRepository;
-use Knp\Component\Pager\PaginatorInterface;
+use App\Service\FriendService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,11 +19,26 @@ use Symfony\Component\Routing\Annotation\Route;
 class FriendController extends AbstractController
 {
     /**
-     * Search action.
+     * Category service.
      *
-     * @param Request          $request          HTTP request
-     * @param User             $user             User
-     * @param FriendRepository $friendRepository Repository
+     * @var \App\Service\FriendService
+     */
+    private $friendService;
+
+    /**
+     * CategoryController constructor.
+     *
+     * @param \App\Service\FriendService $friendService Friend service
+     */
+    public function __construct(FriendService $friendService)
+    {
+        $this->friendService = $friendService;
+    }
+
+    /**
+     * Add friend action.
+     *
+     * @param User $user User
      *
      * @return Response HTTP response
      *
@@ -41,25 +51,16 @@ class FriendController extends AbstractController
      *     name="add_friend",
      * )
      */
-    public function addFriend(Request $request, User $user, FriendRepository $friendRepository): Response
+    public function addFriend(User $user): Response
     {
         $currentUser = $this->getUser();
-        if (null === $currentUser) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        $connection = $friendRepository->getFriendConnection($currentUser, $user);
+        $connection = $this->friendService->getFriendConnection($currentUser, $user);
         if (null !== $connection || $user === $currentUser) {
             $this->addFlash('danger', 'message_add_friend_failed');
 
             return $this->redirectToRoute('profile', ['id' => $user->getId()]);
         }
-
-        $connection = new Friend();
-        $connection->setAccepted(false);
-        $connection->setFromUser($currentUser);
-        $connection->setToUser($user);
-        $friendRepository->save($connection);
+        $this->friendService->addFriendConnection($currentUser, $user);
 
         $this->addFlash('success', 'message_add_friend_success');
 
@@ -69,10 +70,8 @@ class FriendController extends AbstractController
     /**
      * Search action.
      *
-     * @param Request          $request          HTTP request
-     * @param string           $type             Type
-     * @param User             $user             User
-     * @param FriendRepository $friendRepository Repository
+     * @param string $type Type
+     * @param User   $user User
      *
      * @return Response HTTP response
      *
@@ -85,31 +84,21 @@ class FriendController extends AbstractController
      *     name="manage_friend",
      * )
      */
-    public function acceptFriend(Request $request, $type, User $user, FriendRepository $friendRepository): Response
+    public function acceptFriend($type, User $user): Response
     {
-        if ('accept' !== $type && 'decline' !== $type) {
-            return $this->redirectToRoute('profile', ['id' => $user->getId()]);
-        }
-
         $currentUser = $this->getUser();
-        if (null === $currentUser) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        $invitation = $friendRepository->getInvitation($user, $currentUser); //musi przyjść od kogoś do zalogowanego
+        $invitation = $this->friendService->getInvitation($user, $currentUser); //musi przyjść od kogoś do zalogowanego
         if (null === $invitation || $invitation->getAccepted() === true) {
             return $this->redirectToRoute('profile', ['id' => $user->getId()]);
         }
 
         if ('accept' === $type) {
-            $invitation->setAccepted(true);
-            $friendRepository->save($invitation);
+            $this->friendService->acceptInvitation($invitation);
             $this->addFlash('success', 'message_accept_friend_success');
-        } else {
-            $friendRepository->delete($invitation);
+        } elseif ('decline' === $type) {
+            $this->friendService->delete($invitation);
             $this->addFlash('success', 'message_decline_friend_success');
         }
-
 
         return $this->redirectToRoute('profile', ['id' => $user->getId()]);
     }
@@ -117,10 +106,9 @@ class FriendController extends AbstractController
     /**
      * Search action.
      *
-     * @param Request            $request          HTTP request
-     * @param User               $user             User
-     * @param FriendRepository   $friendRepository Repository
-     * @param PaginatorInterface $paginator        Paginator
+     * @param Request          $request          HTTP request
+     * @param User             $user             User
+     * @param FriendRepository $friendRepository Repository
      *
      * @return Response HTTP response
      *
@@ -130,13 +118,10 @@ class FriendController extends AbstractController
      *     name="friends",
      * )
      */
-    public function friends(Request $request, User $user, FriendRepository $friendRepository, PaginatorInterface $paginator): Response
+    public function friends(Request $request, User $user, FriendRepository $friendRepository): Response
     {
-        $pagination = $paginator->paginate(
-            $friendRepository->getFriends($user),
-            $request->query->getInt('page', 1),
-            User::PAGINATOR_ITEMS_PER_PAGE
-        );
+        $page = $request->query->getInt('page', 1);
+        $pagination = $this->friendService->createPaginatedFriendsList($page, $user);
 
         return $this->render(
             'friends.html.twig',
@@ -151,9 +136,7 @@ class FriendController extends AbstractController
     /**
      * Search action.
      *
-     * @param Request            $request          HTTP request
-     * @param FriendRepository   $friendRepository Repository
-     * @param PaginatorInterface $paginator        Paginator
+     * @param Request $request HTTP request
      *
      * @return Response HTTP response
      *
@@ -163,14 +146,10 @@ class FriendController extends AbstractController
      *     name="friend_requests",
      * )
      */
-    public function friendRequests(Request $request, FriendRepository $friendRepository, PaginatorInterface $paginator): Response
+    public function friendRequests(Request $request): Response
     {
-        $user = $this->getUser();
-        $pagination = $paginator->paginate(
-            $friendRepository->getInvitations($user),
-            $request->query->getInt('page', 1),
-            User::PAGINATOR_ITEMS_PER_PAGE
-        );
+        $page = $request->query->getInt('page', 1);
+        $pagination = $this->friendService->createPaginatedInvitationsList($page);
 
         return $this->render(
             'requests.html.twig',

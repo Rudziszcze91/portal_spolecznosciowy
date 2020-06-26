@@ -10,6 +10,7 @@ use App\Entity\Post;
 use App\Form\CommentType;
 use App\Repository\CommentRepository;
 use App\Service\CommentService;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
@@ -41,9 +42,8 @@ class CommentController extends AbstractController
     /**
      * Add comment action.
      *
-     * @param Request           $request           HTTP request
-     * @param Post              $post              Post
-     * @param CommentRepository $commentRepository Post Repository
+     * @param Request $request HTTP request
+     * @param Post    $post    Post
      *
      * @return \Symfony\Component\HttpFoundation\Response HTTP response
      *
@@ -57,7 +57,7 @@ class CommentController extends AbstractController
      *     requirements={"id": "[1-9]\d*"},
      * )
      */
-    public function addComment(Request $request, Post $post, CommentRepository $commentRepository): Response
+    public function addComment(Request $request, Post $post): Response
     {
         $comment = new Comment();
         $form = $this->createForm(CommentType::class, $comment);
@@ -97,14 +97,14 @@ class CommentController extends AbstractController
      *     requirements={"id": "[1-9]\d*"},
      *     name="edit_comment",
      * )
+     *
+     * @IsGranted(
+     *     "EDIT",
+     *     subject="comment",
+     * )
      */
     public function edit(Request $request, Comment $comment): Response
     {
-        if (!$this->commentService->checkUser($comment->getUser())) {
-            $this->addFlash('danger', 'operation_not_permitted');
-
-            return $this->redirectToRoute('profile', ['id' => $comment->getPost()->getUser()->getId()]);
-        }
         $form = $this->createForm(CommentType::class, $comment, ['method' => 'PUT']);
         $form->handleRequest($request);
 
@@ -142,14 +142,14 @@ class CommentController extends AbstractController
      *     requirements={"id": "[1-9]\d*"},
      *     name="delete_comment",
      * )
+     *
+     * @IsGranted(
+     *     "DELETE",
+     *     subject="comment",
+     * )
      */
     public function delete(Request $request, Comment $comment, CommentRepository $commentRepository): Response
     {
-        if (!$this->commentService->checkUser($comment->getUser())) {
-            $this->addFlash('danger', 'operation_not_permitted');
-
-            return $this->redirectToRoute('profile', ['id' => $comment->getPost()->getUser()->getId()]);
-        }
         $form = $this->createForm(FormType::class, $comment, ['method' => 'DELETE']);
         $form->handleRequest($request);
 

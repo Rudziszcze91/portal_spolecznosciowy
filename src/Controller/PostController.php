@@ -8,6 +8,7 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Form\PostType;
 use App\Service\PostService;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,14 +54,14 @@ class PostController extends AbstractController
      *     requirements={"id": "[1-9]\d*"},
      *     name="edit_post",
      * )
+     *
+     * @IsGranted(
+     *     "EDIT",
+     *     subject="post",
+     * )
      */
     public function edit(Request $request, Post $post): Response
     {
-        if (!$this->postService->checkUser($post->getUser())) {
-            $this->addFlash('danger', 'operation_not_permitted');
-
-            return $this->redirectToRoute('profile', ['id' => $post->getUser()->getId()]);
-        }
         $form = $this->createForm(PostType::class, $post, ['method' => 'PUT']);
         $form->handleRequest($request);
 
@@ -97,14 +98,14 @@ class PostController extends AbstractController
      *     requirements={"id": "[1-9]\d*"},
      *     name="delete_post",
      * )
+     *
+     * @IsGranted(
+     *     "DELETE",
+     *     subject="post",
+     * )
      */
     public function delete(Request $request, Post $post): Response
     {
-        if (!$this->postService->checkUser($post->getUser())) {
-            $this->addFlash('danger', 'operation_not_permitted');
-
-            return $this->redirectToRoute('profile', ['id' => $post->getUser()->getId()]);
-        }
         $form = $this->createForm(FormType::class, $post, ['method' => 'DELETE']);
         $form->handleRequest($request);
 

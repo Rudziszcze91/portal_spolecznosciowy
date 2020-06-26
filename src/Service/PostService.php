@@ -53,22 +53,6 @@ class PostService
     }
 
     /**
-     * check user.
-     *
-     * @param User $user User
-     *
-     * @return bool
-     */
-    public function checkUser(User $user)
-    {
-        if ($this->token->getToken()->getUser() !== $user) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Create paginated list.
      *
      * @param int  $page Page number

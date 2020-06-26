@@ -38,7 +38,8 @@ class Comment
      *
      * @Assert\NotBlank
      * @Assert\Length(
-     *     min="3"
+     *     min="3",
+     *     max="50000"
      * )
      */
     private $content;
